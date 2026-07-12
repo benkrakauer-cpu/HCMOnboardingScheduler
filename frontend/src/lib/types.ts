@@ -33,9 +33,11 @@ export interface Pattern {
   items: PatternItem[];
 }
 
-export interface Settings {
-  id?: string;
-  organizerEmail: string;
+// A stored organizer identity, selectable per generation.
+export interface Organizer {
+  id: string;
+  displayName: string;
+  email: string;
 }
 
 export interface GeneratedMeetingSummary {
@@ -49,6 +51,7 @@ export interface GenerationLogEntry {
   timestamp: string;
   newEmployeeEmails: string[];
   patternUsed: string | null;
+  organizerUsed: string | null;
   meetingsGenerated: GeneratedMeetingSummary[];
 }
 

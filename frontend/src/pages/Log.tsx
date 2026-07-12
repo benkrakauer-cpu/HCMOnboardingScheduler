@@ -40,8 +40,11 @@ export function LogPage() {
                 {entry.patternUsed ? `Pattern: ${entry.patternUsed}` : 'Manual'}
               </span>
             </div>
-            <p className="hint mt-0" style={{ marginBottom: 10 }}>
+            <p className="hint mt-0" style={{ marginBottom: 4 }}>
               New employee(s): {entry.newEmployeeEmails.join(', ') || '—'}
+            </p>
+            <p className="hint mt-0" style={{ marginBottom: 10 }}>
+              Organizer: {entry.organizerUsed || '—'}
             </p>
             <table>
               <thead>

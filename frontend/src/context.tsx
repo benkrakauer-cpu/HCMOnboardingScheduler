@@ -1,20 +1,20 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { api } from './lib/api';
-import type { Person, MeetingTemplate, Room, Pattern, Settings } from './lib/types';
+import type { Person, MeetingTemplate, Room, Pattern, Organizer } from './lib/types';
 
 interface DataState {
   people: Person[];
   templates: MeetingTemplate[];
   rooms: Room[];
   patterns: Pattern[];
-  settings: Settings;
+  organizers: Organizer[];
   loading: boolean;
   error: string | null;
   reloadPeople: () => Promise<void>;
   reloadTemplates: () => Promise<void>;
   reloadRooms: () => Promise<void>;
   reloadPatterns: () => Promise<void>;
-  reloadSettings: () => Promise<void>;
+  reloadOrganizers: () => Promise<void>;
   reloadAll: () => Promise<void>;
   personById: (id: string) => Person | undefined;
 }
@@ -26,7 +26,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [templates, setTemplates] = useState<MeetingTemplate[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [patterns, setPatterns] = useState<Pattern[]>([]);
-  const [settings, setSettings] = useState<Settings>({ organizerEmail: '' });
+  const [organizers, setOrganizers] = useState<Organizer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,8 +44,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const reloadPatterns = useCallback(async () => {
     setPatterns(await api.list<Pattern>('patterns'));
   }, []);
-  const reloadSettings = useCallback(async () => {
-    setSettings(await api.getSettings());
+  const reloadOrganizers = useCallback(async () => {
+    const o = await api.list<Organizer>('organizers');
+    o.sort((a, b) => a.displayName.localeCompare(b.displayName));
+    setOrganizers(o);
   }, []);
 
   const reloadAll = useCallback(async () => {
@@ -57,7 +59,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         reloadTemplates(),
         reloadRooms(),
         reloadPatterns(),
-        reloadSettings(),
+        reloadOrganizers(),
       ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -65,7 +67,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [reloadPeople, reloadTemplates, reloadRooms, reloadPatterns, reloadSettings]);
+  }, [reloadPeople, reloadTemplates, reloadRooms, reloadPatterns, reloadOrganizers]);
 
   const personById = useCallback(
     (id: string) => people.find((p) => p.id === id),
@@ -77,14 +79,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     templates,
     rooms,
     patterns,
-    settings,
+    organizers,
     loading,
     error,
     reloadPeople,
     reloadTemplates,
     reloadRooms,
     reloadPatterns,
-    reloadSettings,
+    reloadOrganizers,
     reloadAll,
     personById,
   };

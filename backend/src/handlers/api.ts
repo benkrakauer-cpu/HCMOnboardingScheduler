@@ -27,6 +27,7 @@ const ENTITY_PK: Record<string, EntityPk> = {
   templates: PK.TEMPLATE,
   rooms: PK.ROOM,
   patterns: PK.PATTERN,
+  organizers: PK.ORGANIZER,
 };
 
 function parseBody(event: APIGatewayProxyEventV2): any {
@@ -183,6 +184,10 @@ function validateEntity(resource: string, item: any): string | null {
     case 'rooms':
       if (!item.name?.trim()) return 'name is required';
       return null;
+    case 'organizers':
+      if (!item.displayName?.trim()) return 'displayName is required';
+      if (!item.email?.trim()) return 'email is required';
+      return null;
     case 'patterns':
       if (!item.name?.trim()) return 'name is required';
       if (!Array.isArray(item.items)) return 'items must be an array';
@@ -238,6 +243,7 @@ async function handleLog(
       timestamp: new Date().toISOString(),
       newEmployeeEmails: body.newEmployeeEmails ?? [],
       patternUsed: body.patternUsed ?? null,
+      organizerUsed: body.organizerUsed ?? null,
       meetingsGenerated: body.meetingsGenerated ?? [],
     };
     await putItem(PK.LOG, item);

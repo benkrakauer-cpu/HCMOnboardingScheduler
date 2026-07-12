@@ -116,7 +116,8 @@ export class OnboardingSchedulerStack extends cdk.Stack {
       serviceToken: seedProvider.serviceToken,
       properties: {
         // Bump this to force a re-seed on redeploy (idempotent regardless).
-        SeedVersion: '1',
+        // v2 adds the sample meeting templates.
+        SeedVersion: '2',
       },
     });
 

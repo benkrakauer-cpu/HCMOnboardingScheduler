@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useData } from '../context';
 import { api } from '../lib/api';
 import { RoomPicker } from '../components/RoomPicker';
 import { AttendeeMultiSelect } from '../components/MultiSelect';
+import { OemEmailInput } from '../components/OemEmailInput';
 import { buildIcs, icsFilename, type IcsAttendee } from '../lib/ics';
 import { downloadText, downloadZip } from '../lib/download';
-import { parseEmails, isValidEmail, validateGeneration } from '../lib/validation';
+import { isValidEmail, validateGeneration } from '../lib/validation';
 import { holidayWarning, type HolidayWarning } from '../lib/holidays';
 import { addDays, formatWhen } from '../lib/dates';
 import type { MeetingTemplate, PlannedMeeting } from '../lib/types';
@@ -21,11 +22,20 @@ interface GeneratedResult {
 }
 
 export function GeneratePage() {
-  const { settings, templates, people, patterns, personById } = useData();
-  const organizerEmail = settings.organizerEmail;
+  const { organizers, templates, people, patterns, personById } = useData();
 
   const [mode, setMode] = useState<'manual' | 'pattern'>('manual');
-  const [employeeInput, setEmployeeInput] = useState('');
+
+  // New-employee entries (full resolved addresses) + the in-progress add row.
+  const [employeeEmails, setEmployeeEmails] = useState<string[]>([]);
+  const [pendingEmail, setPendingEmail] = useState('');
+
+  // Selected organizer (defaults to the first available).
+  const [organizerId, setOrganizerId] = useState('');
+  const selectedOrganizer =
+    organizers.find((o) => o.id === organizerId) ?? organizers[0];
+  const organizerEmail = selectedOrganizer?.email ?? '';
+
   const [meetings, setMeetings] = useState<PlannedMeeting[]>([]);
 
   // Pattern-mode controls
@@ -39,7 +49,21 @@ export function GeneratePage() {
   const [genError, setGenError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const employeeEmails = useMemo(() => parseEmails(employeeInput), [employeeInput]);
+  function addEmployee() {
+    const email = pendingEmail.trim();
+    if (!email) return;
+    if (employeeEmails.some((e) => e.toLowerCase() === email.toLowerCase())) {
+      setPendingEmail('');
+      return;
+    }
+    setEmployeeEmails((list) => [...list, email]);
+    setPendingEmail('');
+    resetGenState();
+  }
+  function removeEmployee(email: string) {
+    setEmployeeEmails((list) => list.filter((e) => e !== email));
+    resetGenState();
+  }
 
   function resetGenState() {
     setValidation(null);
@@ -140,7 +164,7 @@ export function GeneratePage() {
           durationMinutes: mtg.durationMinutes,
           room: mtg.room,
           organizer: {
-            displayName: organizerEmail,
+            displayName: selectedOrganizer?.displayName || organizerEmail,
             email: organizerEmail,
           },
           // New employees are added as REQUIRED attendees to every meeting.
@@ -165,6 +189,9 @@ export function GeneratePage() {
           mode === 'pattern'
             ? patterns.find((p) => p.id === patternId)?.name ?? null
             : null,
+        organizerUsed: selectedOrganizer
+          ? `${selectedOrganizer.displayName} <${selectedOrganizer.email}>`
+          : organizerEmail || null,
         meetingsGenerated: generated.map((g) => ({
           title: g.meeting.title,
           startDateTime: formatWhen(g.meeting.date, g.meeting.startTime),
@@ -187,20 +214,21 @@ export function GeneratePage() {
   }
 
   // ---- Organizer gate ----
-  if (!organizerEmail) {
+  if (organizers.length === 0) {
     return (
       <div>
         <h1>Generate</h1>
         <div className="alert warn-hard">
-          <strong>Set your organizer email first.</strong> Go to the <em>Settings</em> screen and
-          enter your own email. It is required as the meeting organizer before you can generate
-          invitations.
+          <strong>Add an organizer first.</strong> Go to the <em>Settings</em> screen and add at
+          least one organizer. An organizer is required as the meeting organizer before you can
+          generate invitations.
         </div>
       </div>
     );
   }
 
-  const canGenerate = employeeEmails.length > 0 && meetings.length > 0;
+  const canGenerate =
+    employeeEmails.length > 0 && meetings.length > 0 && Boolean(organizerEmail);
 
   return (
     <div>
@@ -214,34 +242,68 @@ export function GeneratePage() {
         </div>
       </div>
 
-      {/* Step 1 — new employees */}
+      {/* Step 1 — new employees + organizer */}
       <div className="panel">
-        <h2>1. New employee email(s)</h2>
+        <h2>1. New employee(s)</h2>
         <p className="hint">
-          One or more addresses, separated by commas, spaces, or new lines. Each is added as a
-          required attendee on every meeting.
+          Type each new hire's username — <span className="mono">@oem.nyc.gov</span> is added
+          automatically. Use the override for a non-standard address. Each is added as a required
+          attendee on every meeting.
         </p>
-        <textarea
-          value={employeeInput}
-          placeholder="jane.doe@nycem.nyc.gov, john.smith@nycem.nyc.gov"
-          onChange={(e) => {
-            setEmployeeInput(e.target.value);
-            resetGenState();
-          }}
-        />
+        <div className="row" style={{ alignItems: 'flex-start' }}>
+          <div className="field" style={{ flex: 1, marginBottom: 0 }}>
+            <OemEmailInput
+              value={pendingEmail}
+              onChange={setPendingEmail}
+              onEnter={addEmployee}
+              placeholder="jdoe"
+            />
+          </div>
+          <div className="field" style={{ flex: '0 0 auto', marginBottom: 0 }}>
+            <button
+              className="btn"
+              onClick={addEmployee}
+              disabled={!isValidEmail(pendingEmail)}
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+
         {employeeEmails.length > 0 && (
-          <div className="chips">
+          <div className="chips" style={{ marginTop: 12 }}>
             {employeeEmails.map((email) => (
               <span className={`chip ${isValidEmail(email) ? '' : 'invalid'}`} key={email}>
                 {email}
                 {!isValidEmail(email) && ' (invalid)'}
+                <button onClick={() => removeEmployee(email)} aria-label={`Remove ${email}`}>
+                  ×
+                </button>
               </span>
             ))}
           </div>
         )}
-        <p className="hint" style={{ marginTop: 10 }}>
-          Organizer (from Settings): <strong>{organizerEmail}</strong>
-        </p>
+
+        <div className="field" style={{ marginTop: 18, marginBottom: 0, maxWidth: 420 }}>
+          <label>Organizer (required)</label>
+          <select
+            value={selectedOrganizer?.id ?? ''}
+            onChange={(e) => {
+              setOrganizerId(e.target.value);
+              resetGenState();
+            }}
+          >
+            {organizers.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.displayName} — {o.email}
+              </option>
+            ))}
+          </select>
+          <p className="hint">
+            Stamped as the invitation <span className="mono">ORGANIZER</span>. Manage the list on
+            the Settings screen.
+          </p>
+        </div>
       </div>
 
       {/* Step 2 — build meetings */}

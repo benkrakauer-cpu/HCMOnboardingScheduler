@@ -4,6 +4,7 @@ export const PK = {
   TEMPLATE: 'TEMPLATE',
   ROOM: 'ROOM',
   PATTERN: 'PATTERN',
+  ORGANIZER: 'ORGANIZER',
   LOG: 'LOG',
   SETTINGS: 'SETTINGS',
 } as const;
@@ -60,9 +61,13 @@ export interface GenerationLogEntry {
   timestamp: string;
   newEmployeeEmails: string[];
   patternUsed: string | null;
+  organizerUsed: string | null;
   meetingsGenerated: GeneratedMeetingSummary[];
 }
 
-export interface Settings {
-  organizerEmail: string;
+// A stored organizer identity the user can select at generation time.
+export interface Organizer {
+  id: string;
+  displayName: string;
+  email: string;
 }

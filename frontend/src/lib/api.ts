@@ -77,11 +77,6 @@ export const api = {
   remove: (resource: string, id: string) =>
     request<void>('DELETE', `/${resource}/${id}`),
 
-  getSettings: () =>
-    request<{ id?: string; organizerEmail: string }>('GET', '/settings'),
-  saveSettings: (organizerEmail: string) =>
-    request<{ organizerEmail: string }>('PUT', '/settings', { organizerEmail }),
-
   getLog: <T>() => request<T[]>('GET', '/log'),
   addLog: (entry: unknown) => request<unknown>('POST', '/log', entry),
 };
