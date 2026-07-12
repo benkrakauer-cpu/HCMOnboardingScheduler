@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+frontend/dist/
+backend/dist/
+
+# CDK
+infra/cdk.out/
+cdk.out/
+.cdk.staging/
+
+# Env / secrets — NEVER commit credentials
+.env
+.env.*
+!.env.example
+*.pem
+aws-credentials*
+credentials
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Frontend runtime config produced by deploy scripts
+frontend/.env.production.local

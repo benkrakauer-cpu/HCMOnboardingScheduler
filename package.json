@@ -1,0 +1,19 @@
+{
+  "name": "hcm-onboarding-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NYCEM HCM Onboarding Scheduler — generate Outlook .ics onboarding invitations",
+  "license": "UNLICENSED",
+  "workspaces": [
+    "infra",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "build:backend": "npm run build --workspace backend",
+    "build:frontend": "npm run build --workspace frontend",
+    "synth": "npm run synth --workspace infra",
+    "deploy:backend": "npm run deploy --workspace infra"
+  }
+}
