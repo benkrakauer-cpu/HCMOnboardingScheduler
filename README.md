@@ -22,7 +22,7 @@ new-employee onboarding.
   - [3. Set the password and JWT secret](#3-set-the-password-and-jwt-secret)
   - [4. Deploy the frontend](#4-deploy-the-frontend)
   - [5. (Optional) Custom domain + HTTPS certificate](#5-optional-custom-domain--https-certificate)
-  - [6. Set your organizer email](#6-set-your-organizer-email)
+  - [6. Add an organizer](#6-add-an-organizer)
 - [Using the app](#using-the-app)
 - [The generated `.ics` files](#the-generated-ics-files)
 - [Cost](#cost)
@@ -230,11 +230,13 @@ propagates, the app is live at
 make deploy-frontend
 ```
 
-### 6. Set your organizer email
+### 6. Add an organizer
 
-Open the app → **Settings** → enter **your own email**. This is used as the
-`ORGANIZER` on every generated invitation. Generation is **blocked** until it is
-set.
+Open the app → **Settings** → **Add organizer** (display name + email). You can
+store several; on the Generate screen you pick which one is stamped as the
+invitation `ORGANIZER`. Emails follow the `@oem.nyc.gov` convention (type the
+username; the suffix is added) with a per-entry override for other domains.
+Generation is **blocked** until at least one organizer exists.
 
 ---
 
@@ -247,18 +249,23 @@ Navigation (Generate is the landing screen):
 - **Directory** — people & distribution lists you reuse as attendees.
 - **Meetings** — meeting templates (title, default duration, default room,
   required/optional attendees, notes). Mark an "optional" meeting by putting it
-  in the **title** (e.g. `Supervisor Meet & Greet - Optional`).
+  in the **title** (e.g. `Supervisor Meet & Greet - Optional`). First deploy
+  seeds five sample templates (Security / HCM / IT Orientation, Supervisor Meet
+  and Greet - Optional, Lunch Break) with blank rooms and no attendees.
 - **Rooms** — add / rename / delete rooms.
 - **Patterns** — a named onboarding sequence: meeting templates with a day
   offset (0 = start date), start time, and optional duration override.
+- **Settings** — the list of **organizers** you can choose from at generation.
 - **Generate** — the main screen. Two modes:
   - **Manual** — add meetings one at a time, pre-filling from a template.
   - **From a pattern** — pick a saved pattern + one start date; the app computes
     the concrete date/time for every meeting. Edit any field afterward.
 
-  In both modes you enter the **new employee email(s)** (added as required
-  attendees to every meeting). A **validation step** runs before generation and
-  will surface **2026 NYC holiday / weekend warnings** for you to acknowledge.
+  In both modes you add **new employee(s)** (username + `@oem.nyc.gov`, or an
+  override) as removable chips — each is added as a required attendee to every
+  meeting — and pick the **organizer**. A **validation step** runs before
+  generation and will surface **2026 NYC holiday / weekend warnings** for you to
+  acknowledge.
 
 - **Log** — an append-only record of every generation batch.
 
