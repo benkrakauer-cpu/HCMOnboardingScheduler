@@ -10,10 +10,31 @@ import { downloadText, downloadZip } from '../lib/download';
 import { isValidEmail, validateGeneration } from '../lib/validation';
 import { holidayWarning, type HolidayWarning } from '../lib/holidays';
 import { addDays, formatWhen } from '../lib/dates';
-import type { MeetingTemplate, PlannedMeeting } from '../lib/types';
+import type { MeetingTemplate, PlannedMeeting, RepeatFreq } from '../lib/types';
 
 let keyCounter = 0;
 const nextKey = () => `m${Date.now()}-${keyCounter++}`;
+
+/** Expand any recurring meetings into one concrete occurrence per repeat. */
+function expandOccurrences(list: PlannedMeeting[]): PlannedMeeting[] {
+  const out: PlannedMeeting[] = [];
+  for (const m of list) {
+    if (m.repeatFreq === 'none' || !m.date) {
+      out.push(m);
+      continue;
+    }
+    const count = Math.max(1, Math.floor(m.repeatCount) || 1);
+    const step = m.repeatFreq === 'weekly' ? 7 : 1;
+    for (let i = 0; i < count; i++) {
+      out.push({
+        ...m,
+        key: count > 1 ? `${m.key}-occ${i + 1}` : m.key,
+        date: addDays(m.date, i * step),
+      });
+    }
+  }
+  return out;
+}
 
 interface GeneratedResult {
   meeting: PlannedMeeting;
@@ -82,8 +103,11 @@ export function GeneratePage() {
       startTime,
       durationMinutes: t?.defaultDurationMinutes ?? 30,
       room: t?.defaultRoom ?? '',
+      notes: t?.notes ?? '',
       requiredAttendeeIds: t ? [...t.requiredAttendeeIds] : [],
       optionalAttendeeIds: t ? [...t.optionalAttendeeIds] : [],
+      repeatFreq: 'none',
+      repeatCount: 1,
     };
   }
 
@@ -123,6 +147,7 @@ export function GeneratePage() {
       title: t.title,
       durationMinutes: t.defaultDurationMinutes,
       room: t.defaultRoom,
+      notes: t.notes,
       requiredAttendeeIds: [...t.requiredAttendeeIds],
       optionalAttendeeIds: [...t.optionalAttendeeIds],
     });
@@ -135,15 +160,17 @@ export function GeneratePage() {
 
   function handleGenerate() {
     setGenError(null);
-    const result = validateGeneration(organizerEmail, employeeEmails, meetings);
+    // Validate the fully-expanded occurrence list so recurring dates are checked.
+    const expanded = expandOccurrences(meetings);
+    const result = validateGeneration(organizerEmail, employeeEmails, expanded);
     setValidation(result);
     setResults(null);
     if (result.errors.length > 0) return;
     if (result.warnings.length > 0 && !acknowledged) return; // wait for acknowledgment
-    doGenerate();
+    doGenerate(expanded);
   }
 
-  async function doGenerate() {
+  async function doGenerate(expanded: PlannedMeeting[]) {
     setBusy(true);
     setGenError(null);
     try {
@@ -151,7 +178,7 @@ export function GeneratePage() {
         .filter(isValidEmail)
         .map((email) => ({ displayName: email, email }));
 
-      const generated: GeneratedResult[] = meetings.map((mtg) => {
+      const generated: GeneratedResult[] = expanded.map((mtg) => {
         const templateRequired = mtg.requiredAttendeeIds
           .map(resolveAttendee)
           .filter((a): a is IcsAttendee => a !== null);
@@ -162,12 +189,18 @@ export function GeneratePage() {
         // New employees are added as REQUIRED attendees to every meeting.
         const requiredAttendees = [...templateRequired, ...employeeAttendees];
 
+        // Invitation body: the template's configurable text, then the reminder.
+        const body = mtg.notes?.trim()
+          ? `${mtg.notes.trim()}\n\n${REMINDER_LINE}`
+          : REMINDER_LINE;
+
         const content = buildIcs({
           title: mtg.title,
           date: mtg.date,
           startTime: mtg.startTime,
           durationMinutes: mtg.durationMinutes,
           room: mtg.room,
+          notes: mtg.notes,
           organizer: {
             displayName: selectedOrganizer?.displayName || organizerEmail,
             email: organizerEmail,
@@ -185,7 +218,7 @@ export function GeneratePage() {
           startTime: mtg.startTime,
           durationMinutes: mtg.durationMinutes,
           location: mtg.room,
-          body: REMINDER_LINE,
+          body,
           attendeeEmails,
         });
 
@@ -471,7 +504,7 @@ export function GeneratePage() {
                   <strong>{r.meeting.title}</strong>
                   <div className="hint mt-0">
                     {formatWhen(r.meeting.date, r.meeting.startTime)} · {r.meeting.durationMinutes} min ·{' '}
-                    {r.meeting.room}
+                    {r.meeting.room || 'No room'}
                   </div>
                   {r.warning && (
                     <span className={`badge ${r.warning.level}`} style={{ marginTop: 4, display: 'inline-block' }}>
@@ -585,6 +618,49 @@ function MeetingEditor({
           <label>Room</label>
           <RoomPicker value={meeting.room} onChange={(room) => onChange({ room })} />
         </div>
+      </div>
+
+      <div className="row">
+        <div className="field" style={{ maxWidth: 190 }}>
+          <label>Repeat</label>
+          <select
+            value={meeting.repeatFreq}
+            onChange={(e) => onChange({ repeatFreq: e.target.value as RepeatFreq })}
+          >
+            <option value="none">Does not repeat</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        {meeting.repeatFreq !== 'none' && (
+          <div className="field" style={{ maxWidth: 150 }}>
+            <label>Occurrences</label>
+            <input
+              type="number"
+              min={1}
+              max={60}
+              value={meeting.repeatCount}
+              onChange={(e) => onChange({ repeatCount: Math.max(1, Number(e.target.value)) })}
+            />
+          </div>
+        )}
+      </div>
+      {meeting.repeatFreq !== 'none' && (
+        <p className="hint" style={{ marginTop: -6, marginBottom: 12 }}>
+          Generates {Math.max(1, Math.floor(meeting.repeatCount) || 1)} separate invitations, one
+          every {meeting.repeatFreq === 'weekly' ? 'week' : 'day'} starting{' '}
+          {meeting.date || 'the chosen date'}.
+        </p>
+      )}
+
+      <div className="field">
+        <label>Invitation body — what it's about &amp; what to bring</label>
+        <textarea
+          value={meeting.notes}
+          rows={3}
+          placeholder="Pre-filled from the template; edit for this meeting if needed."
+          onChange={(e) => onChange({ notes: e.target.value })}
+        />
       </div>
 
       {warning && (

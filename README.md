@@ -248,10 +248,12 @@ Navigation (Generate is the landing screen):
 
 - **Directory** — people & distribution lists you reuse as attendees.
 - **Meetings** — meeting templates (title, default duration, default room,
-  required/optional attendees, notes). Mark an "optional" meeting by putting it
-  in the **title** (e.g. `Supervisor Meet & Greet - Optional`). First deploy
-  seeds five sample templates (Security / HCM / IT Orientation, Supervisor Meet
-  and Greet - Optional, Lunch Break) with blank rooms and no attendees.
+  required/optional attendees, and an **invitation body** — what the meeting is
+  about and what to bring, included in every invitation and editable per
+  meeting). Mark an "optional" meeting by putting it in the **title** (e.g.
+  `Supervisor Meet & Greet - Optional`). First deploy seeds five sample
+  templates (Security / HCM / IT Orientation, Supervisor Meet and Greet -
+  Optional, Lunch Break) with blank rooms and no attendees.
 - **Rooms** — add / rename / delete rooms.
 - **Patterns** — a named onboarding sequence: meeting templates with a day
   offset (0 = start date), start time, and optional duration override.
@@ -263,9 +265,11 @@ Navigation (Generate is the landing screen):
 
   In both modes you add **new employee(s)** (username + `@oem.nyc.gov`, or an
   override) as removable chips — each is added as a required attendee to every
-  meeting — and pick the **organizer**. A **validation step** runs before
-  generation and will surface **2026 NYC holiday / weekend warnings** for you to
-  acknowledge.
+  meeting — and pick the **organizer**. Any meeting can **repeat** (daily or
+  weekly for N occurrences — e.g. lunch every day for the week); each occurrence
+  is generated as its own invitation so it works with both the Outlook link and
+  the `.ics`. A **validation step** runs before generation and will surface
+  **2026 NYC holiday / weekend warnings** for you to acknowledge.
 
 - **Log** — an append-only record of every generation batch.
 

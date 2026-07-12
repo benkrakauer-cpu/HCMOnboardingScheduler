@@ -187,11 +187,20 @@ function TemplateModal({
         />
       </div>
       <div className="field">
-        <label>Notes (added to invitation description)</label>
+        <label>Invitation body — what the meeting is about &amp; what to bring</label>
         <textarea
           value={form.notes}
+          rows={5}
+          placeholder={
+            'e.g. Welcome to NYCEM! This session covers building access and your ID badge.\n' +
+            'Please bring: a photo ID and your completed I-9 documents.'
+          }
           onChange={(e) => setForm({ ...form, notes: e.target.value })}
         />
+        <p className="hint">
+          Included in the invitation body for every meeting generated from this template. Editable
+          per meeting on the Generate screen.
+        </p>
       </div>
       <div className="btn-row">
         <button className="btn" onClick={save} disabled={busy}>

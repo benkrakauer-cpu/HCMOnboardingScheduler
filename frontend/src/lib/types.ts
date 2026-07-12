@@ -62,6 +62,8 @@ export interface ResolvedAttendee {
   role: 'REQ' | 'OPT';
 }
 
+export type RepeatFreq = 'none' | 'daily' | 'weekly';
+
 /** A fully-specified meeting ready to be turned into an .ics file. */
 export interface PlannedMeeting {
   key: string; // stable client id for list rendering
@@ -70,6 +72,9 @@ export interface PlannedMeeting {
   startTime: string; // "HH:MM"
   durationMinutes: number;
   room: string;
+  notes: string; // invitation body (what it's about / what to bring)
   requiredAttendeeIds: string[];
   optionalAttendeeIds: string[];
+  repeatFreq: RepeatFreq;
+  repeatCount: number; // number of occurrences (>=1); 1 == single meeting
 }
