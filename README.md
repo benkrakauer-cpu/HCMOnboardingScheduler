@@ -276,9 +276,10 @@ All times are **America/New_York**. All events are single-occurrence.
 On **Generate** you get **one `.ics` per meeting** (plus a *Download all
 (.zip)*). Each file:
 
-- uses `METHOD:REQUEST` so Outlook opens it as a meeting **you organize** and
-  offers **Send**;
-- sets `ORGANIZER` to your Settings email;
+- uses `METHOD:PUBLISH` so the file opens reliably on double-click as an
+  editable calendar event you own — including in **new Outlook** and **Outlook
+  on the web**, which refuse to open a self-organized `METHOD:REQUEST` file;
+- sets `ORGANIZER` to the organizer you selected on Generate;
 - lists required attendees (template required **+ new employees**) as
   `ROLE=REQ-PARTICIPANT` and optional attendees as `ROLE=OPT-PARTICIPANT`;
 - carries a full **`VTIMEZONE` for America/New_York** (with DST rules) so
@@ -286,9 +287,9 @@ On **Generate** you get **one `.ics` per meeting** (plus a *Download all
 - includes the description reminder: *"Add your Teams link before sending, if
   applicable."*
 
-**Flow:** open each `.ics` in Outlook → it opens as a meeting you organize with
-attendees pre-filled → add a Teams link if needed → review → **Send** from your
-own O365 account.
+**Flow:** open each `.ics` in Outlook → it opens as a calendar event with the
+attendees and details filled in → add a Teams link if needed → invite/**Send**
+from your own Outlook.
 
 ## Cost
 

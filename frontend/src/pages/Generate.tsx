@@ -438,8 +438,8 @@ export function GeneratePage() {
             </button>
           </div>
           <div className="alert success" style={{ marginTop: 14 }}>
-            Open each .ics in Outlook. It opens as a meeting you organize with attendees pre-filled
-            — add a Teams link if needed, review, then <strong>Send</strong>.
+            Open each .ics in Outlook. It opens as a calendar event with the attendees and details
+            filled in — add a Teams link if needed, then invite/<strong>Send</strong> from Outlook.
           </div>
           {results.map((r) => (
             <div

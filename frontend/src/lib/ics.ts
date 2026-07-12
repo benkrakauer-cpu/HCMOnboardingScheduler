@@ -1,8 +1,10 @@
-// RFC 5545 .ics builder tuned for Outlook / O365.
+// RFC 5545 .ics builder tuned for Outlook / O365 (incl. new Outlook & web).
 //
-// Produces a single VEVENT with METHOD:REQUEST so Outlook opens it as a meeting
-// the user organizes (offering "Send"), with required/optional attendees
-// pre-filled and correct America/New_York local time via an embedded VTIMEZONE.
+// Produces a single VEVENT with METHOD:PUBLISH so the file opens reliably on
+// double-click as an editable calendar event owned by the user, with the
+// required/optional attendees and details filled in and correct
+// America/New_York local time via an embedded VTIMEZONE. The user then adds a
+// Teams link if needed and sends/invites from their own Outlook.
 
 const REMINDER_LINE = 'Add your Teams link before sending, if applicable.';
 const UID_DOMAIN = 'onboardingscheduler.benjaminkrakauer.com';
@@ -145,7 +147,11 @@ export function buildIcs(meeting: IcsMeeting): string {
     'VERSION:2.0',
     'PRODID:-//NYCEM HCM//Onboarding Scheduler//EN',
     'CALSCALE:GREGORIAN',
-    'METHOD:REQUEST',
+    // PUBLISH (not REQUEST): a REQUEST is an iTIP invitation, and new Outlook /
+    // Outlook on the web refuse to open one whose ORGANIZER is the person
+    // opening it. PUBLISH opens reliably as an editable calendar event with the
+    // attendees and details filled in, ready to invite/send.
+    'METHOD:PUBLISH',
     ...VTIMEZONE,
     'BEGIN:VEVENT',
     `UID:${uid()}`,
@@ -160,6 +166,8 @@ export function buildIcs(meeting: IcsMeeting): string {
     'SEQUENCE:0',
     'STATUS:CONFIRMED',
     'TRANSP:OPAQUE',
+    'X-MICROSOFT-CDO-BUSYSTATUS:BUSY',
+    'X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY',
     'END:VEVENT',
     'END:VCALENDAR',
   ];
