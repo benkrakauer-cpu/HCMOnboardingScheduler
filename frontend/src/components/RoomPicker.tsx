@@ -2,9 +2,14 @@ import { useState } from 'react';
 import { useData } from '../context';
 import { api } from '../lib/api';
 
+// LOCATION value used for virtual meetings. The user still adds the real Teams
+// link before sending; this just labels the event as virtual.
+export const VIRTUAL_LOCATION = 'Microsoft Teams Meeting';
+
 /**
- * Room dropdown with an inline "add new room" affordance. Newly added rooms
- * persist (they are saved to the Rooms directory) and become selected.
+ * Room dropdown with an inline "add new room" affordance, plus built-in
+ * "No room" and "Virtual" options. Newly added rooms persist (they are saved
+ * to the Rooms directory) and become selected.
  */
 export function RoomPicker({
   value,
@@ -35,9 +40,10 @@ export function RoomPicker({
     }
   }
 
-  // Ensure the current value is selectable even if it's a room no longer listed.
-  const options = rooms.map((r) => r.name);
-  if (value && !options.includes(value)) options.unshift(value);
+  const roomNames = rooms.map((r) => r.name);
+  // A custom value (e.g. a room since deleted) still needs to be selectable.
+  const customRoom =
+    value && value !== VIRTUAL_LOCATION && !roomNames.includes(value) ? value : null;
 
   if (adding) {
     return (
@@ -63,8 +69,10 @@ export function RoomPicker({
   return (
     <div style={{ display: 'flex', gap: 8 }}>
       <select value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="">— Select a room —</option>
-        {options.map((name) => (
+        <option value="">— No room (e.g. Lunch) —</option>
+        <option value={VIRTUAL_LOCATION}>Virtual (Microsoft Teams)</option>
+        {customRoom && <option value={customRoom}>{customRoom}</option>}
+        {roomNames.map((name) => (
           <option key={name} value={name}>
             {name}
           </option>

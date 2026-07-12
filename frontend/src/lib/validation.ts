@@ -80,7 +80,7 @@ export function validateGeneration(
     if (!mtg.startTime) errors.push(`"${label}" is missing a start time.`);
     if (!mtg.durationMinutes || mtg.durationMinutes <= 0)
       errors.push(`"${label}" is missing a valid duration.`);
-    if (!mtg.room?.trim()) errors.push(`"${label}" is missing a room.`);
+    // Room is optional — lunch and virtual meetings need no physical room.
 
     if (mtg.date) {
       const warning = holidayWarning(mtg.date);

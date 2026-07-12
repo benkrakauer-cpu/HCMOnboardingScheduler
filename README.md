@@ -271,25 +271,27 @@ Navigation (Generate is the landing screen):
 
 All times are **America/New_York**. All events are single-occurrence.
 
-## The generated `.ics` files
+## Generating invitations — two ways to open each meeting
 
-On **Generate** you get **one `.ics` per meeting** (plus a *Download all
-(.zip)*). Each file:
+On **Generate**, each meeting produces a card with two buttons:
 
-- uses `METHOD:PUBLISH` so the file opens reliably on double-click as an
-  editable calendar event you own — including in **new Outlook** and **Outlook
-  on the web**, which refuse to open a self-organized `METHOD:REQUEST` file;
-- sets `ORGANIZER` to the organizer you selected on Generate;
-- lists required attendees (template required **+ new employees**) as
-  `ROLE=REQ-PARTICIPANT` and optional attendees as `ROLE=OPT-PARTICIPANT`;
-- carries a full **`VTIMEZONE` for America/New_York** (with DST rules) so
-  Outlook shows the correct local time;
-- includes the description reminder: *"Add your Teams link before sending, if
-  applicable."*
+- **Open in Outlook (recommended for new Outlook / O365).** A deep link that
+  opens the Outlook-web / new-Outlook **event compose** pre-filled with the
+  subject, time, location, body, and attendees. Add a Teams link if needed and
+  click **Send**. This is the reliable path because **new Outlook (Windows) and
+  Outlook on the web do not open local `.ics` files** on double-click.
+- **Download `.ics`** (plus a *Download all (.zip)*). Best for **classic desktop
+  Outlook** or record-keeping. Each file uses `METHOD:PUBLISH` (opens as an
+  editable event you own), sets `ORGANIZER` to the organizer you selected, lists
+  required attendees (template required **+ new employees**) as
+  `ROLE=REQ-PARTICIPANT` and optional as `ROLE=OPT-PARTICIPANT`, carries a full
+  **`VTIMEZONE` for America/New_York** (DST-aware), and includes the reminder
+  *"Add your Teams link before sending, if applicable."*
 
-**Flow:** open each `.ics` in Outlook → it opens as a calendar event with the
-attendees and details filled in → add a Teams link if needed → invite/**Send**
-from your own Outlook.
+**Rooms are optional.** Leave the room blank for meetings with no room (e.g.
+Lunch), or pick **Virtual (Microsoft Teams)** in the room picker for virtual
+meetings — that sets the location to *Microsoft Teams Meeting* (you still add
+the real Teams link before sending).
 
 ## Cost
 

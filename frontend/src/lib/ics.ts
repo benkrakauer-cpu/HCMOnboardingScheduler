@@ -6,7 +6,7 @@
 // America/New_York local time via an embedded VTIMEZONE. The user then adds a
 // Teams link if needed and sends/invites from their own Outlook.
 
-const REMINDER_LINE = 'Add your Teams link before sending, if applicable.';
+export const REMINDER_LINE = 'Add your Teams link before sending, if applicable.';
 const UID_DOMAIN = 'onboardingscheduler.benjaminkrakauer.com';
 
 export interface IcsAttendee {
@@ -159,7 +159,8 @@ export function buildIcs(meeting: IcsMeeting): string {
     `DTSTART;TZID=America/New_York:${dtStart}`,
     `DTEND;TZID=America/New_York:${dtEnd}`,
     `SUMMARY:${escapeText(meeting.title)}`,
-    `LOCATION:${escapeText(meeting.room)}`,
+    // Room is optional (e.g. lunch); omit LOCATION entirely when blank.
+    ...(meeting.room?.trim() ? [`LOCATION:${escapeText(meeting.room)}`] : []),
     `DESCRIPTION:${escapeText(description)}`,
     organizerLine,
     ...attendeeLines,

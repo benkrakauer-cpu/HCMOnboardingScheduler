@@ -4,7 +4,8 @@ import { api } from '../lib/api';
 import { RoomPicker } from '../components/RoomPicker';
 import { AttendeeMultiSelect } from '../components/MultiSelect';
 import { OemEmailInput } from '../components/OemEmailInput';
-import { buildIcs, icsFilename, type IcsAttendee } from '../lib/ics';
+import { buildIcs, icsFilename, REMINDER_LINE, type IcsAttendee } from '../lib/ics';
+import { outlookComposeUrl } from '../lib/outlook';
 import { downloadText, downloadZip } from '../lib/download';
 import { isValidEmail, validateGeneration } from '../lib/validation';
 import { holidayWarning, type HolidayWarning } from '../lib/holidays';
@@ -18,6 +19,7 @@ interface GeneratedResult {
   meeting: PlannedMeeting;
   filename: string;
   content: string;
+  outlookUrl: string;
   warning: HolidayWarning;
 }
 
@@ -157,6 +159,9 @@ export function GeneratePage() {
           .map(resolveAttendee)
           .filter((a): a is IcsAttendee => a !== null);
 
+        // New employees are added as REQUIRED attendees to every meeting.
+        const requiredAttendees = [...templateRequired, ...employeeAttendees];
+
         const content = buildIcs({
           title: mtg.title,
           date: mtg.date,
@@ -167,15 +172,28 @@ export function GeneratePage() {
             displayName: selectedOrganizer?.displayName || organizerEmail,
             email: organizerEmail,
           },
-          // New employees are added as REQUIRED attendees to every meeting.
-          requiredAttendees: [...templateRequired, ...employeeAttendees],
+          requiredAttendees,
           optionalAttendees: optional,
+        });
+
+        // Deep link that opens Outlook-web / new-Outlook compose pre-filled.
+        // All attendees go in one field (the web compose has no optional slot).
+        const attendeeEmails = [...new Set([...requiredAttendees, ...optional].map((a) => a.email))];
+        const outlookUrl = outlookComposeUrl({
+          title: mtg.title,
+          date: mtg.date,
+          startTime: mtg.startTime,
+          durationMinutes: mtg.durationMinutes,
+          location: mtg.room,
+          body: REMINDER_LINE,
+          attendeeEmails,
         });
 
         return {
           meeting: mtg,
           filename: icsFilename(mtg.title, mtg.date, mtg.startTime),
           content,
+          outlookUrl,
           warning: holidayWarning(mtg.date),
         };
       });
@@ -438,8 +456,10 @@ export function GeneratePage() {
             </button>
           </div>
           <div className="alert success" style={{ marginTop: 14 }}>
-            Open each .ics in Outlook. It opens as a calendar event with the attendees and details
-            filled in — add a Teams link if needed, then invite/<strong>Send</strong> from Outlook.
+            <strong>Recommended for new Outlook / O365:</strong> click <em>Open in Outlook</em> —
+            it opens the web event compose with attendees and details pre-filled. Add a Teams link
+            if needed, then <strong>Send</strong>. The <em>.ics</em> download is for classic desktop
+            Outlook or record-keeping (new Outlook can't open local .ics files).
           </div>
           {results.map((r) => (
             <div
@@ -459,12 +479,22 @@ export function GeneratePage() {
                     </span>
                   )}
                 </div>
-                <button
-                  className="btn"
-                  onClick={() => downloadText(r.filename, r.content)}
-                >
-                  Download .ics
-                </button>
+                <div className="btn-row" style={{ flexWrap: 'nowrap' }}>
+                  <a
+                    className="btn"
+                    href={r.outlookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open in Outlook
+                  </a>
+                  <button
+                    className="btn secondary"
+                    onClick={() => downloadText(r.filename, r.content)}
+                  >
+                    Download .ics
+                  </button>
+                </div>
               </div>
             </div>
           ))}
