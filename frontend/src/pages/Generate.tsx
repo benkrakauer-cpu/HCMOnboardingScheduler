@@ -4,9 +4,8 @@ import { api } from '../lib/api';
 import { RoomPicker } from '../components/RoomPicker';
 import { AttendeeMultiSelect } from '../components/MultiSelect';
 import { OemEmailInput } from '../components/OemEmailInput';
-import { buildIcs, icsFilename, REMINDER_LINE, type IcsAttendee } from '../lib/ics';
+import { REMINDER_LINE, type IcsAttendee } from '../lib/ics';
 import { outlookComposeUrl } from '../lib/outlook';
-import { downloadText, downloadZip } from '../lib/download';
 import { isValidEmail, validateGeneration } from '../lib/validation';
 import { holidayWarning, type HolidayWarning } from '../lib/holidays';
 import { addDays, formatWhen } from '../lib/dates';
@@ -38,8 +37,6 @@ function expandOccurrences(list: PlannedMeeting[]): PlannedMeeting[] {
 
 interface GeneratedResult {
   meeting: PlannedMeeting;
-  filename: string;
-  content: string;
   outlookUrl: string;
   warning: HolidayWarning;
 }
@@ -194,21 +191,6 @@ export function GeneratePage() {
           ? `${mtg.notes.trim()}\n\n${REMINDER_LINE}`
           : REMINDER_LINE;
 
-        const content = buildIcs({
-          title: mtg.title,
-          date: mtg.date,
-          startTime: mtg.startTime,
-          durationMinutes: mtg.durationMinutes,
-          room: mtg.room,
-          notes: mtg.notes,
-          organizer: {
-            displayName: selectedOrganizer?.displayName || organizerEmail,
-            email: organizerEmail,
-          },
-          requiredAttendees,
-          optionalAttendees: optional,
-        });
-
         // Deep link that opens Outlook-web / new-Outlook compose pre-filled.
         // All attendees go in one field (the web compose has no optional slot).
         const attendeeEmails = [...new Set([...requiredAttendees, ...optional].map((a) => a.email))];
@@ -224,8 +206,6 @@ export function GeneratePage() {
 
         return {
           meeting: mtg,
-          filename: icsFilename(mtg.title, mtg.date, mtg.startTime),
-          content,
           outlookUrl,
           warning: holidayWarning(mtg.date),
         };
@@ -256,14 +236,6 @@ export function GeneratePage() {
     }
   }
 
-  async function downloadAll() {
-    if (!results) return;
-    await downloadZip(
-      'onboarding-invitations.zip',
-      results.map((r) => ({ filename: r.filename, content: r.content })),
-    );
-  }
-
   // ---- Organizer gate ----
   if (organizers.length === 0) {
     return (
@@ -287,8 +259,9 @@ export function GeneratePage() {
         <div>
           <h1 className="mb-0">Generate Invitations</h1>
           <p>
-            Build onboarding meetings, then download an Outlook .ics for each. Nothing is sent —
-            you review and send from your own Outlook.
+            Build the onboarding meetings, then click <strong>Open in Outlook</strong> on each one.
+            It opens the Outlook event compose with attendees and details pre-filled — you add a
+            Teams link if needed and send it yourself. Nothing is sent automatically.
           </p>
         </div>
       </div>
@@ -482,17 +455,11 @@ export function GeneratePage() {
       {/* Results */}
       {results && results.length > 0 && (
         <div className="panel">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="mb-0">Generated {results.length} invitation(s)</h2>
-            <button className="btn" onClick={downloadAll}>
-              Download all (.zip)
-            </button>
-          </div>
+          <h2 className="mb-0">Generated {results.length} invitation(s)</h2>
           <div className="alert success" style={{ marginTop: 14 }}>
-            <strong>Recommended for new Outlook / O365:</strong> click <em>Open in Outlook</em> —
-            it opens the web event compose with attendees and details pre-filled. Add a Teams link
-            if needed, then <strong>Send</strong>. The <em>.ics</em> download is for classic desktop
-            Outlook or record-keeping (new Outlook can't open local .ics files).
+            For each meeting below, click <strong>Open in Outlook</strong>. It opens the Outlook
+            event compose with the attendees and details pre-filled — add a Teams link if needed,
+            then <strong>Send</strong>.
           </div>
           {results.map((r) => (
             <div
@@ -512,22 +479,14 @@ export function GeneratePage() {
                     </span>
                   )}
                 </div>
-                <div className="btn-row" style={{ flexWrap: 'nowrap' }}>
-                  <a
-                    className="btn"
-                    href={r.outlookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Open in Outlook
-                  </a>
-                  <button
-                    className="btn secondary"
-                    onClick={() => downloadText(r.filename, r.content)}
-                  >
-                    Download .ics
-                  </button>
-                </div>
+                <a
+                  className="btn"
+                  href={r.outlookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open in Outlook
+                </a>
               </div>
             </div>
           ))}

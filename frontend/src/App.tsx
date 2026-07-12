@@ -112,11 +112,15 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
   return (
     <div className="app-shell">
       <nav className="sidebar">
-        <div className="brand">
+        <button
+          className="brand"
+          onClick={() => setPage('generate')}
+          title="Go to Generate"
+        >
           Onboarding
           <br />
           Scheduler
-        </div>
+        </button>
         {NAV.map((n) => (
           <button
             key={n.id}

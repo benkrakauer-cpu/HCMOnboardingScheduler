@@ -273,24 +273,20 @@ Navigation (Generate is the landing screen):
 
 - **Log** — an append-only record of every generation batch.
 
-All times are **America/New_York**. All events are single-occurrence.
+All times are **America/New_York**.
 
-## Generating invitations — two ways to open each meeting
+## Generating invitations — Open in Outlook
 
-On **Generate**, each meeting produces a card with two buttons:
+On **Generate**, each meeting produces a card with an **Open in Outlook**
+button. It's a deep link that opens the Outlook **event compose** (new Outlook /
+Outlook on the web) pre-filled with the subject, time (America/New_York),
+location, body, and attendees (template required + new employees). You add a
+Teams link if needed and click **Send** — nothing is sent automatically.
 
-- **Open in Outlook (recommended for new Outlook / O365).** A deep link that
-  opens the Outlook-web / new-Outlook **event compose** pre-filled with the
-  subject, time, location, body, and attendees. Add a Teams link if needed and
-  click **Send**. This is the reliable path because **new Outlook (Windows) and
-  Outlook on the web do not open local `.ics` files** on double-click.
-- **Download `.ics`** (plus a *Download all (.zip)*). Best for **classic desktop
-  Outlook** or record-keeping. Each file uses `METHOD:PUBLISH` (opens as an
-  editable event you own), sets `ORGANIZER` to the organizer you selected, lists
-  required attendees (template required **+ new employees**) as
-  `ROLE=REQ-PARTICIPANT` and optional as `ROLE=OPT-PARTICIPANT`, carries a full
-  **`VTIMEZONE` for America/New_York** (DST-aware), and includes the reminder
-  *"Add your Teams link before sending, if applicable."*
+This is the only path, by design: **new Outlook (Windows) and Outlook on the web
+do not open local `.ics` files** on double-click, so a downloaded `.ics` was
+removed to avoid confusion. (If a `.ics`/classic-Outlook export is needed later,
+the builder in `frontend/src/lib/ics.ts` is still present and can be re-surfaced.)
 
 **Rooms are optional.** Leave the room blank for meetings with no room (e.g.
 Lunch), or pick **Virtual (Microsoft Teams)** in the room picker for virtual
