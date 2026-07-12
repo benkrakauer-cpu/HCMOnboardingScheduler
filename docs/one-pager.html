@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HCM Onboarding Scheduler — Overview</title>
+    <style>
+      :root {
+        --navy: #13294b;
+        --navy-2: #1c3a63;
+        --accent: #1f5eff;
+        --ink: #1f2933;
+        --muted: #59636f;
+        --line: #d7dde5;
+        --soft: #f5f7fa;
+        --soft-2: #eef2f7;
+      }
+
+      * { box-sizing: border-box; }
+
+      html {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        font-size: 10pt;
+        line-height: 1.42;
+      }
+
+      .page {
+        max-width: 7.4in;
+        margin: 0 auto;
+        padding: 0.1in 0.1in 0.2in;
+      }
+
+      /* ---------- Title block ---------- */
+      .masthead {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-bottom: 3px solid var(--navy);
+        padding-bottom: 11px;
+      }
+      .mark {
+        flex: 0 0 auto;
+        width: 46px;
+        height: 46px;
+      }
+      .masthead h1 {
+        margin: 0;
+        font-size: 19pt;
+        letter-spacing: -0.01em;
+        color: var(--navy);
+        line-height: 1.1;
+      }
+      .masthead .purpose {
+        margin: 3px 0 0;
+        font-size: 10.8pt;
+        color: var(--muted);
+      }
+      .masthead .url {
+        margin-top: 6px;
+        font-size: 9.6pt;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: 0.01em;
+      }
+
+      /* ---------- Sections ---------- */
+      section {
+        margin-top: 8px;
+      }
+      /* Keep the header block with the first section on the page. */
+      .masthead { break-after: avoid; }
+      h2 { break-after: avoid; }
+      h2 {
+        margin: 0 0 6px;
+        font-size: 11.5pt;
+        color: var(--navy);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 3px;
+      }
+      p { margin: 0 0 7px; }
+      .lead { font-size: 10.2pt; }
+
+      /* ---------- Step tiles ---------- */
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .tile {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 7px 10px 8px;
+        background: #fff;
+        break-inside: avoid;
+      }
+      .tile .head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .tile .num {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        background: var(--navy);
+        color: #fff;
+        border-radius: 50%;
+        font-size: 8.5pt;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tile .title {
+        font-size: 9.6pt;
+        font-weight: 700;
+        color: var(--navy);
+        line-height: 1.15;
+      }
+      .tile p {
+        margin: 0;
+        font-size: 8.7pt;
+        color: var(--muted);
+        line-height: 1.3;
+      }
+      .tile .title .opt {
+        display: block;
+        font-size: 7.6pt;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      /* ---------- Diagram ---------- */
+      .diagram {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--soft);
+        padding: 10px 10px 6px;
+        break-inside: avoid;
+      }
+      .diagram svg { width: 100%; max-width: 580px; height: auto; display: block; margin: 0 auto; }
+      .diagram .note {
+        margin: 6px 4px 2px;
+        font-size: 8.8pt;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      /* ---------- Tech table ---------- */
+      table.tech {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table.tech td {
+        vertical-align: top;
+        padding: 5px 10px 5px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 10pt;
+      }
+      table.tech td.k {
+        width: 33%;
+        font-weight: 600;
+        color: var(--navy);
+      }
+      .nonfeatures {
+        margin-top: 10px;
+        background: var(--soft-2);
+        border-left: 3px solid var(--navy);
+        padding: 8px 12px;
+        font-size: 9.6pt;
+        border-radius: 0 6px 6px 0;
+      }
+
+      /* ---------- Two-column helper ---------- */
+      .cols {
+        display: flex;
+        gap: 18px;
+      }
+      .cols > div { flex: 1; }
+
+      .cols { break-inside: avoid; }
+      .callout {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 11px 13px;
+        break-inside: avoid;
+      }
+      .callout h3 {
+        margin: 0 0 6px;
+        font-size: 10pt;
+        color: var(--navy);
+      }
+      .callout ul {
+        margin: 0;
+        padding-left: 16px;
+      }
+      .callout li { margin-bottom: 4px; }
+
+      .safety {
+        margin-top: 10px;
+        border: 1px solid var(--navy);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 9.8pt;
+        background: #fff;
+      }
+      .safety strong { color: var(--navy); }
+
+      /* ---------- Footer ---------- */
+      footer {
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 8.6pt;
+        color: var(--muted);
+      }
+      footer .org { font-weight: 600; color: var(--navy); }
+
+      .newpage { break-before: page; page-break-before: always; }
+
+      @page {
+        size: Letter portrait;
+        margin: 0.55in;
+      }
+      @media print {
+        .page { max-width: none; padding: 0; }
+        body { font-size: 10pt; }
+        /* On screen the two "pages" flow continuously; in print they split. */
+        .newpage { margin-top: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- 1. Title block -->
+      <header class="masthead">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="4" y="6" width="24" height="22" rx="3.5" fill="#13294b" />
+          <path d="M4 9.5a3.5 3.5 0 0 1 3.5-3.5h17A3.5 3.5 0 0 1 28 9.5V13H4z" fill="#1f5eff" />
+          <rect x="9" y="2.5" width="2.6" height="6.5" rx="1.3" fill="#13294b" />
+          <rect x="20.4" y="2.5" width="2.6" height="6.5" rx="1.3" fill="#13294b" />
+          <rect x="8" y="16" width="4" height="4" rx="1" fill="#ffffff" />
+          <rect x="14" y="16" width="4" height="4" rx="1" fill="#ffffff" />
+          <rect x="20" y="16" width="4" height="4" rx="1" fill="#ffffff" />
+          <rect x="8" y="22" width="4" height="3.4" rx="1" fill="#c9d8f5" />
+          <rect x="14" y="22" width="4" height="3.4" rx="1" fill="#c9d8f5" />
+        </svg>
+        <div>
+          <h1>HCM Onboarding Scheduler</h1>
+          <p class="purpose">
+            Generate reviewable Outlook onboarding invitations — the system never sends anything.
+          </p>
+          <div class="url">OnboardingScheduler.BenjaminKrakauer.com</div>
+        </div>
+      </header>
+
+      <!-- 2. What it does -->
+      <section>
+        <h2>What it does</h2>
+        <p class="lead">
+          An internal web tool that prepares a new hire's onboarding meeting invitations. Staff
+          assemble the meetings — individually or from a saved pattern — set the dates and times,
+          and add the employee's email. Each meeting then opens in Outlook, pre-filled with
+          attendees, time, location, and description. <strong>The system never sends anything</strong>
+          — the HCM user adds a Teams link if needed, reviews, and sends from their own Outlook / O365.
+        </p>
+      </section>
+
+      <!-- 3. How to use it -->
+      <section>
+        <h2>How to use it</h2>
+        <div class="tiles">
+          <div class="tile">
+            <div class="head"><span class="num">1</span><span class="title">Sign in</span></div>
+            <p>Enter the shared team password.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">2</span><span class="title">Set up once</span></div>
+            <p>Add your <b>Directory</b>, <b>Rooms</b>, <b>Meetings</b> templates, and one or more <b>Organizers</b>.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">3</span><span class="title">Build a pattern <span class="opt">optional</span></span></div>
+            <p>Save a reusable meeting sequence with day offsets and times.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">4</span><span class="title">Choose a mode</span></div>
+            <p><b>Manual</b> (add meetings one by one) or <b>Pattern</b> (a saved sequence + a start date).</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">5</span><span class="title">Add hire &amp; organizer</span></div>
+            <p>Type the username (<i>@oem.nyc.gov</i> added automatically); pick who sends.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">6</span><span class="title">Tune the meetings</span></div>
+            <p>Date, time, duration, room or virtual, attendees, and optional daily/weekly repeat.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">7</span><span class="title">Review warnings</span></div>
+            <p>NYC holidays and weekends are flagged for you to acknowledge.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">8</span><span class="title">Generate</span></div>
+            <p>Each meeting appears as its own card. Every batch is saved to the <b>Log</b>.</p>
+          </div>
+          <div class="tile">
+            <div class="head"><span class="num">9</span><span class="title">Open in Outlook</span></div>
+            <p>Opens pre-filled — add a Teams link if needed, review, and <b>Send</b>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. How it works -->
+      <section>
+        <h2>How it works</h2>
+        <div class="diagram">
+          <svg viewBox="0 0 720 372" role="img"
+               aria-label="Architecture: browser React app served by CloudFront and S3, calling API Gateway and Lambda backed by DynamoDB and Secrets Manager; invitations open directly in Outlook on the web.">
+            <defs>
+              <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0,0 L9,4.5 L0,9 z" fill="#1f5eff" />
+              </marker>
+              <marker id="arwg" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0,0 L9,4.5 L0,9 z" fill="#8a97a8" />
+              </marker>
+            </defs>
+
+            <!-- hosting (left) -->
+            <rect x="20" y="40" width="176" height="60" rx="7" fill="#ffffff" stroke="#c3ccd8" />
+            <text x="108" y="63" text-anchor="middle" font-size="12" font-weight="700" fill="#13294b">CloudFront + S3</text>
+            <text x="108" y="80" text-anchor="middle" font-size="10.5" fill="#59636f">Static hosting (TLS)</text>
+            <text x="108" y="93" text-anchor="middle" font-size="10.5" fill="#59636f">private bucket · OAC</text>
+
+            <!-- browser (top center) -->
+            <rect x="256" y="14" width="208" height="58" rx="7" fill="#13294b" />
+            <text x="360" y="38" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">User's Browser</text>
+            <text x="360" y="56" text-anchor="middle" font-size="10.5" fill="#c9d8f5">React SPA (TypeScript)</text>
+
+            <!-- outlook (right) -->
+            <rect x="524" y="26" width="176" height="60" rx="7" fill="#ffffff" stroke="#1f5eff" />
+            <text x="612" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#13294b">Outlook on the web</text>
+            <text x="612" y="66" text-anchor="middle" font-size="10.5" fill="#59636f">pre-filled compose —</text>
+            <text x="612" y="79" text-anchor="middle" font-size="10.5" fill="#59636f">user reviews &amp; Sends</text>
+
+            <!-- API gateway -->
+            <rect x="256" y="130" width="208" height="46" rx="7" fill="#ffffff" stroke="#c3ccd8" />
+            <text x="360" y="151" text-anchor="middle" font-size="12" font-weight="700" fill="#13294b">API Gateway</text>
+            <text x="360" y="167" text-anchor="middle" font-size="10.5" fill="#59636f">HTTP API</text>
+
+            <!-- lambda -->
+            <rect x="256" y="216" width="208" height="46" rx="7" fill="#ffffff" stroke="#c3ccd8" />
+            <text x="360" y="237" text-anchor="middle" font-size="12" font-weight="700" fill="#13294b">AWS Lambda</text>
+            <text x="360" y="253" text-anchor="middle" font-size="10.5" fill="#59636f">Node.js / TypeScript</text>
+
+            <!-- secrets manager (right of lambda) -->
+            <rect x="524" y="216" width="176" height="46" rx="7" fill="#ffffff" stroke="#c3ccd8" />
+            <text x="612" y="237" text-anchor="middle" font-size="11.5" font-weight="700" fill="#13294b">Secrets Manager</text>
+            <text x="612" y="253" text-anchor="middle" font-size="10" fill="#59636f">password + token key</text>
+
+            <!-- dynamodb -->
+            <rect x="256" y="302" width="208" height="46" rx="7" fill="#ffffff" stroke="#c3ccd8" />
+            <text x="360" y="323" text-anchor="middle" font-size="12" font-weight="700" fill="#13294b">DynamoDB</text>
+            <text x="360" y="339" text-anchor="middle" font-size="10.5" fill="#59636f">single table · on-demand</text>
+
+            <!-- arrows: hosting serves browser -->
+            <line x1="196" y1="58" x2="254" y2="46" stroke="#8a97a8" stroke-width="1.6" marker-end="url(#arwg)" />
+            <text x="205" y="34" font-size="8.6" fill="#59636f">loads app</text>
+
+            <!-- browser -> outlook -->
+            <line x1="466" y1="46" x2="522" y2="52" stroke="#1f5eff" stroke-width="1.8" marker-end="url(#arw)" />
+
+            <!-- spine: browser -> apigw -> lambda -> dynamo -->
+            <line x1="360" y1="72" x2="360" y2="128" stroke="#1f5eff" stroke-width="1.8" marker-end="url(#arw)" />
+            <text x="368" y="104" font-size="8.6" fill="#59636f">authenticated API calls (Bearer token)</text>
+            <line x1="360" y1="176" x2="360" y2="214" stroke="#1f5eff" stroke-width="1.8" marker-end="url(#arw)" />
+            <line x1="360" y1="262" x2="360" y2="300" stroke="#1f5eff" stroke-width="1.8" marker-end="url(#arw)" />
+
+            <!-- lambda -> secrets -->
+            <line x1="464" y1="239" x2="522" y2="239" stroke="#8a97a8" stroke-width="1.6" marker-end="url(#arwg)" />
+          </svg>
+          <p class="note">
+            The app loads from S3 via CloudFront (TLS) and calls one Lambda through API Gateway. The
+            Lambda validates the password and session token against Secrets Manager and reads/writes
+            data in DynamoDB. Invitations are composed in the browser and opened directly in Outlook —
+            the system stores data but <strong>never emails anyone.</strong>
+          </p>
+          <p class="note">
+            <strong>Design note:</strong> invitations open directly in Outlook on the web rather than
+            as downloaded <i>.ics</i> files, since new Outlook does not open local <i>.ics</i> files.
+            The standards-compliant <i>.ics</i> generator remains in the codebase for classic-Outlook use.
+          </p>
+        </div>
+      </section>
+
+      <!-- 5. Underlying technology -->
+      <section class="newpage">
+        <h2>Underlying technology</h2>
+        <table class="tech">
+          <tr>
+            <td class="k">Frontend</td>
+            <td>React single-page app (TypeScript) hosted on Amazon S3 behind CloudFront (private bucket, Origin Access Control), served over TLS.</td>
+          </tr>
+          <tr>
+            <td class="k">Backend</td>
+            <td>Amazon API Gateway (HTTP API) routing to a single AWS Lambda function (Node.js / TypeScript).</td>
+          </tr>
+          <tr>
+            <td class="k">Data</td>
+            <td>Amazon DynamoDB — one table, on-demand billing — holding the directory, meeting templates, rooms, patterns, organizers, and the generation log.</td>
+          </tr>
+          <tr>
+            <td class="k">Access control</td>
+            <td>AWS Secrets Manager stores the shared gate password and the session-token signing key. The Lambda verifies the password server-side and issues a short-lived signed session token.</td>
+          </tr>
+          <tr>
+            <td class="k">Certificates / DNS</td>
+            <td>AWS Certificate Manager (ACM) TLS certificate for the custom domain; DNS managed externally.</td>
+          </tr>
+          <tr>
+            <td class="k">Infrastructure</td>
+            <td>Defined as code with the AWS CDK (TypeScript). Region us-east-1, in an isolated AWS account.</td>
+          </tr>
+        </table>
+        <div class="nonfeatures">
+          <strong>Deliberate non-features:</strong> no Cognito, no SES / SMS, no Microsoft Graph or
+          Teams API. Invitations are <em>prepared</em> for the user to review and send — the system
+          sends no email and posts to no calendar on its own.
+        </div>
+      </section>
+
+      <!-- 6. Access & security -->
+      <section>
+        <div class="cols">
+          <div class="callout">
+            <h3>Access &amp; security</h3>
+            <ul>
+              <li>Single shared password gate, intended for the HCM team's internal use.</li>
+              <li>The password is checked <b>server-side</b> in the Lambda against Secrets Manager — it is never shipped in the web app.</li>
+              <li>A successful sign-in returns a short-lived signed session token that authorizes each subsequent request.</li>
+              <li>Data table and hosting bucket are retained on teardown; the bucket is private (no public access).</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <h3>What the system will not do</h3>
+            <ul>
+              <li><b>It never sends email.</b> Every invitation is reviewed and sent by the user from their own Outlook / O365 account.</li>
+              <li>It does not connect to Microsoft 365, Teams, or any mail service.</li>
+              <li>It does not auto-book rooms or write to anyone's calendar.</li>
+              <li>All meeting times are handled in <b>America/New&nbsp;York</b>.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="safety">
+          <strong>Core safety property.</strong> The Onboarding Scheduler is a preparation tool. It
+          assembles and pre-fills onboarding meeting invitations; a person always performs the final
+          review and the actual send. Nothing leaves the tool without an HCM staff member clicking
+          <em>Send</em> in their own Outlook.
+        </div>
+      </section>
+
+      <!-- 7. Footer -->
+      <footer>
+        <div class="org">NYC Emergency Management — Human Capital Management</div>
+        <div>Version 1.0 · July 2026 · Internal system overview</div>
+      </footer>
+    </div>
+  </body>
+</html>
