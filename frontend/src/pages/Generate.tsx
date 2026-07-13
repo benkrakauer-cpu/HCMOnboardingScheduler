@@ -227,6 +227,7 @@ export function GeneratePage() {
           title: g.meeting.title,
           startDateTime: formatWhen(g.meeting.date, g.meeting.startTime),
           room: g.meeting.room,
+          outlookUrl: g.outlookUrl,
         })),
       });
     } catch (err) {
@@ -242,7 +243,7 @@ export function GeneratePage() {
       <div>
         <h1>Generate</h1>
         <div className="alert warn-hard">
-          <strong>Add an organizer first.</strong> Go to the <em>Settings</em> screen and add at
+          <strong>Add an organizer first.</strong> Go to the <em>Organizers</em> screen and add at
           least one organizer. An organizer is required as the meeting organizer before you can
           generate invitations.
         </div>
@@ -325,7 +326,7 @@ export function GeneratePage() {
           </select>
           <p className="hint">
             Stamped as the invitation <span className="mono">ORGANIZER</span>. Manage the list on
-            the Settings screen.
+            the Organizers screen.
           </p>
         </div>
       </div>

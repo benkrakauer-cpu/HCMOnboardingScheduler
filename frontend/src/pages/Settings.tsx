@@ -25,7 +25,7 @@ export function SettingsPage() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="mb-0">Settings — Organizers</h1>
+          <h1 className="mb-0">Organizers</h1>
           <p>
             The people who can appear as the meeting organizer. On the Generate screen you pick one
             per batch; it is stamped as the invitation organizer.

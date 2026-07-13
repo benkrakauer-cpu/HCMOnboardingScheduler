@@ -16,7 +16,7 @@ type PageId =
   | 'directory'
   | 'rooms'
   | 'log'
-  | 'settings';
+  | 'organizers';
 
 const NAV: { id: PageId; label: string }[] = [
   { id: 'generate', label: 'Generate' },
@@ -25,7 +25,7 @@ const NAV: { id: PageId; label: string }[] = [
   { id: 'directory', label: 'Directory' },
   { id: 'rooms', label: 'Rooms' },
   { id: 'log', label: 'Log' },
-  { id: 'settings', label: 'Settings' },
+  { id: 'organizers', label: 'Organizers' },
 ];
 
 export function App() {
@@ -143,7 +143,7 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
         {page === 'directory' && <DirectoryPage />}
         {page === 'rooms' && <RoomsPage />}
         {page === 'log' && <LogPage />}
-        {page === 'settings' && <SettingsPage />}
+        {page === 'organizers' && <SettingsPage />}
       </main>
     </div>
   );

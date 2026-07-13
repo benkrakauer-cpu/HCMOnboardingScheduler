@@ -15,12 +15,20 @@ export function LogPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function regenerateAll(entry: GenerationLogEntry) {
+    const urls = entry.meetingsGenerated
+      .map((m) => m.outlookUrl)
+      .filter((u): u is string => Boolean(u));
+    // Opened within the click gesture; the browser may ask to allow pop-ups.
+    urls.forEach((u) => window.open(u, '_blank', 'noopener,noreferrer'));
+  }
+
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="mb-0">Generation Log</h1>
-          <p>A record of every batch of invitations you generated.</p>
+          <p>A record of every batch of invitations — reopen any of them in Outlook.</p>
         </div>
       </div>
 
@@ -32,40 +40,73 @@ export function LogPage() {
           <div className="empty">Nothing generated yet.</div>
         </div>
       ) : (
-        entries.map((entry) => (
-          <div className="card" key={entry.id}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-              <strong>{formatTimestamp(entry.timestamp)}</strong>
-              <span className="text-muted">
-                {entry.patternUsed ? `Pattern: ${entry.patternUsed}` : 'Manual'}
-              </span>
-            </div>
-            <p className="hint mt-0" style={{ marginBottom: 4 }}>
-              New employee(s): {entry.newEmployeeEmails.join(', ') || '—'}
-            </p>
-            <p className="hint mt-0" style={{ marginBottom: 10 }}>
-              Organizer: {entry.organizerUsed || '—'}
-            </p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Meeting</th>
-                  <th>Start</th>
-                  <th>Room</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entry.meetingsGenerated.map((m, i) => (
-                  <tr key={i}>
-                    <td>{m.title}</td>
-                    <td>{m.startDateTime}</td>
-                    <td>{m.room}</td>
+        entries.map((entry) => {
+          const regenCount = entry.meetingsGenerated.filter((m) => m.outlookUrl).length;
+          return (
+            <div className="card" key={entry.id}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                <strong>{formatTimestamp(entry.timestamp)}</strong>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span className="text-muted">
+                    {entry.patternUsed ? `Pattern: ${entry.patternUsed}` : 'Manual'}
+                  </span>
+                  {regenCount > 0 && (
+                    <button className="btn small" onClick={() => regenerateAll(entry)}>
+                      Regenerate all ({regenCount})
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="hint mt-0" style={{ marginBottom: 4 }}>
+                New employee(s): {entry.newEmployeeEmails.join(', ') || '—'}
+              </p>
+              <p className="hint mt-0" style={{ marginBottom: 10 }}>
+                Organizer: {entry.organizerUsed || '—'}
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Meeting</th>
+                    <th>Start</th>
+                    <th>Room</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))
+                </thead>
+                <tbody>
+                  {entry.meetingsGenerated.map((m, i) => (
+                    <tr key={i}>
+                      <td>{m.title}</td>
+                      <td>{m.startDateTime}</td>
+                      <td>{m.room || <span className="text-muted">—</span>}</td>
+                      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        {m.outlookUrl ? (
+                          <a
+                            className="btn secondary small"
+                            href={m.outlookUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open in Outlook
+                          </a>
+                        ) : (
+                          <span className="text-muted" style={{ fontSize: '0.8rem' }}>
+                            not regenerable
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {regenCount > 0 && (
+                <p className="hint" style={{ marginTop: 8, marginBottom: 0 }}>
+                  Reopens the same pre-filled Outlook compose for each meeting. “Regenerate all” may
+                  prompt your browser to allow multiple tabs.
+                </p>
+              )}
+            </div>
+          );
+        })
       )}
     </div>
   );

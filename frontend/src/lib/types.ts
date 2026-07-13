@@ -44,6 +44,9 @@ export interface GeneratedMeetingSummary {
   title: string;
   startDateTime: string;
   room: string;
+  // Present for entries generated after log-regeneration shipped; lets the Log
+  // re-open the same pre-filled Outlook compose.
+  outlookUrl?: string;
 }
 
 export interface GenerationLogEntry {
