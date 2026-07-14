@@ -11,6 +11,14 @@ REGION ?= us-east-1
 EXPECTED_ACCOUNT := 098217739895
 STACK ?= OnboardingSchedulerStack
 
+# Custom domain defaults so every `make deploy-backend` keeps the CloudFront
+# alias attached. The stack removes the alias if these are not supplied, so they
+# must be passed on EVERY deploy — defaulting them here prevents that footgun.
+# Override on the command line if the domain/cert ever change. (These are public
+# infrastructure identifiers, not secrets.)
+DOMAIN ?= onboardingscheduler.benjaminkrakauer.com
+CERT_ARN ?= arn:aws:acm:us-east-1:098217739895:certificate/542aa55d-b01b-444c-ae9f-fbb9e786e2b7
+
 .PHONY: help install build guard-account deploy-backend deploy-cert \
         outputs deploy-frontend clean
 
