@@ -70,12 +70,12 @@ export class OnboardingSchedulerStack extends cdk.Stack {
     const bundling = {
       minify: true,
       sourceMap: true,
-      target: 'node20',
+      target: 'node22', // esbuild syntax target (runs on the node22/24 runtime)
       externalModules: ['@aws-sdk/*'], // provided by the Lambda runtime
     };
 
     const apiFn = new NodejsFunction(this, 'ApiFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../../backend/src/handlers/api.ts'),
       handler: 'handler',
       memorySize: 256,
@@ -98,7 +98,7 @@ export class OnboardingSchedulerStack extends cdk.Stack {
     // First-run seeding of the Rooms list via a deploy-time custom resource.
     // ---------------------------------------------------------------------
     const seedFn = new NodejsFunction(this, 'SeedFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../../backend/src/handlers/seed.ts'),
       handler: 'handler',
       memorySize: 128,
